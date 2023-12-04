@@ -1,7 +1,7 @@
 # Use an official Python 3.9 image based on Windows Server Core
 FROM python:3.9-windowsservercore
 
-LABEL maintainer="ibadathossain"
+LABEL maintainer="***"
 
 ENV PYTHONUNBUFFERED 1
 
@@ -18,26 +18,19 @@ WORKDIR /app
 # Expose any necessary ports (this is a documentation feature in Windows containers)
 EXPOSE 8000
 
+# ARG directive should be defined before any RUN directives
 ARG DEV=false
 
 # Create a virtual environment, install dependencies, and set up the environment
-RUN python -m venv /py && \
-    /py/bin/pip install --upgrade pip && \
-    /py/bin/pip install -r /tmp/requirements.txt && \
-    if [ $DEV = "true" ]; then \
-        /py/bin/pip install -r /tmp/requirements.dev.txt ; \
-    fi && \
-    rm -rf /tmp && \
-    adduser \
-        --disabled-password \
-        --no-create-home \
-        django-user
+RUN powershell -Command "\
+    python -m venv C:\py ; \
+    C:\py\Scripts\pip install --upgrade pip ; \
+    C:\py\Scripts\pip install -r C:\tmp\requirements.txt ; \
+    if ($env:DEV -eq 'true') { \
+        C:\py\Scripts\pip install -r C:\tmp\requirements.dev.txt ; \
+    } ; \
+    Remove-Item -Path C:\tmp -Recurse -Force ; \
+    Add-User -DisabledPassword -NoCreateHome -UserName django-user"
 
-# Specify the full path to flake8 executable
-CMD ["/py/bin/flake8"]
-
-
-
-ENV PATH="/py/bin:$PATH"
-
-USER django-user
+# Switch to the 'django-user' user
+USER ContainerAdministrator
