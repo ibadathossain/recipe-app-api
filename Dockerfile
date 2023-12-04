@@ -1,5 +1,5 @@
 # Use an official Python 3.9 image based on Windows Server Core
-FROM python:3.9-alpine3.13
+FROM python:3.9-windowsservercore
 
 LABEL maintainer="ibadathossain"
 
