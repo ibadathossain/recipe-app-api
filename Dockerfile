@@ -1,7 +1,7 @@
 # Use an official Python 3.9 image based on Windows Server Core
 FROM python:3.9-windowsservercore
 
-LABEL maintainer="***"
+LABEL maintainer="ibadathossain"
 
 ENV PYTHONUNBUFFERED 1
 
@@ -29,8 +29,10 @@ RUN powershell -Command "\
     if ($env:DEV -eq 'true') { \
         C:\py\Scripts\pip install -r C:\tmp\requirements.dev.txt ; \
     } ; \
-    Remove-Item -Path C:\tmp -Recurse -Force ; \
-    Add-User -DisabledPassword -NoCreateHome -UserName django-user"
+ adduser \
+        --disabled-password \
+        --no-create-home \
+        django-user
 
 # Switch to the 'django-user' user
 USER ContainerAdministrator
