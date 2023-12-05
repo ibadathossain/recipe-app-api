@@ -1,5 +1,5 @@
-# Use an official Python 3.9 image based on Windows Server Core
-FROM python:3.9-windowsservercore
+# Use an official Python 3.9 image based on slim
+FROM python:3.9-slim
 
 LABEL maintainer="ibadathossain"
 
@@ -15,24 +15,23 @@ COPY ./app /app
 # Set the working directory
 WORKDIR /app
 
-# Expose any necessary ports (this is a documentation feature in Windows containers)
+# Expose any necessary ports
 EXPOSE 8000
 
 # ARG directive should be defined before any RUN directives
 ARG DEV=false
 
 # Create a virtual environment, install dependencies, and set up the environment
-RUN powershell -Command "\
-    python -m venv C:\py ; \
-    C:\py\Scripts\pip install --upgrade pip ; \
-    C:\py\Scripts\pip install -r C:\tmp\requirements.txt ; \
-    if ($env:DEV -eq 'true') { \
-        C:\py\Scripts\pip install -r C:\tmp\requirements.dev.txt ; \
-    } ; \
- adduser \
+RUN python -m venv /py && \
+    /py/bin/pip install --upgrade pip && \
+    /py/bin/pip install -r /tmp/requirements.txt && \
+    rm -rf /tmp && \
+    adduser \
         --disabled-password \
         --no-create-home \
         django-user
 
+
+
 # Switch to the 'django-user' user
-USER ContainerAdministrator
+USER django-user
