@@ -1,6 +1,5 @@
 # Use an official Python 3.9 image based on Windows Server Core
-FROM python:3.9.18-alpine3.18
-
+FROM python:3.9-windowsservercore
 
 LABEL maintainer="ibadathossain"
 
@@ -22,19 +21,17 @@ EXPOSE 8000
 # ARG directive should be defined before any RUN directives
 ARG DEV=false
 
-
 # Create a virtual environment, install dependencies, and set up the environment
-RUN python -m venv /venv && \
-    /venv/bin/pip install --upgrade pip && \
-    /venv/bin/pip install -r /tmp/requirements.txt && \
-    if [ "$DEV" = "true" ]; then /venv/bin/pip install -r /tmp/requirements.dev.txt; fi
-
+RUN powershell -Command "\
+    python -m venv C:\venv ; \
+    C:\venv\Scripts\pip install --upgrade pip ; \
+    C:\venv\Scripts\pip install -r C:\tmp\requirements.txt ; \
+    if ($env:DEV -eq 'true') { \
+        C:\venv\Scripts\pip install -r C:\tmp\requirements.dev.txt ; \
+    }"
 
 # Create a user named 'django-user' (or any other name you prefer)
-RUN adduser -D django-user
+RUN net user django-user /add
 
 # Switch to the 'django-user' user
 USER django-user
-
-# Command to run the application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
